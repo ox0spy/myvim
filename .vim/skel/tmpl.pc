@@ -1,0 +1,48 @@
+/************************************************************************
+Author      : ox0spy
+Email       : ossteerer@gmail.com
+Blog        : ox0spy.cn
+Date        :  
+File Name   :  
+Description :  
+**************************************************************************/
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sqlca.h>
+
+int main(int argc, char *argv[])
+{
+	EXEC SQL BEGIN DECLARE SECTION;
+	char dbuser[10] = "ccms";
+	char dbpass[10] = "ccms";
+	char dbname[10] = "ccms";
+	int  count = -1;
+	EXEC SQL END DECLARE SECTION;
+
+	/* connect oracle */
+	EXEC SQL CONNECT :dbuser IDENTIFIED BY :dbpass USING :dbname;
+	if (0 != sqlca.sqlcode)
+	{
+		fprintf(stderr, "connect to oracle error [%d] [%s]\n",
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+		return -1;
+	}
+
+	/* select from dual */
+	EXEC SQL select count(*) into :count from dual;
+	if (0 != sqlca.sqlcode)
+	{
+		fprintf(stderr, "select error: [%d] [%s]\n",
+				sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+		return -1;
+	}
+	fprintf(stdout, "count : %d ...\n");
+
+	/* close connection */
+	EXEC SQL COMMIT WORK RELEASE;
+
+	return 0;
+}
