@@ -3,6 +3,7 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set encoding=utf-8 " default set with the shell $LANG variable
 set fileencodings=utf-8,gb18030,gbk,gb2312,cp936,ucs-bom
+"set termencoding=utf-8
 set nocompatible " get out of horrible vi-compatible mode
 set history=100 " How many lines of history to remember
 set ffs=unix,dos,mac " support all three, in this order
@@ -32,6 +33,11 @@ colorscheme evening " my theme for terminal
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set nobackup " make backup file
 set makeef=error.err " When using make, where should it dump the file
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Spell check
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+setlocal spell spelllang=en_us
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -130,7 +136,7 @@ let Tlist_Enable_Fold_Column = 0 " Do not show folding tree
 
 " which tags files CTRL-] will search
 "set tags=./tags,./../tags,./../../tags,./**/tags,tags 
-set tags=./tags,/code/ctags/c_tags,/code/ctags/ora_tags,/code/ctags/tux_tags
+set tags=./tags,/media/share/code/tags,/media/share/code/pulseaudio/pulseaudio-tags
 " auto change the current dierctory when you open the file or window
 " or any other buffer  Vim64不支持
 "set autochdir 
@@ -233,7 +239,21 @@ function! SignFixme()
 endfunction
 map <F5> :call SignFixme()<cr>
 
-" 自定义的命令
+" Remove trailing whitespace when writing a buffer, but not for diff files.
+" From: Vigil
+" @see http://blog.bs2.to/post/EdwardLee/17961
+function RemoveTrailingWhitespace()
+    if &ft != "diff"
+        let b:curcol = col(".")
+        let b:curline = line(".")
+        silent! %s/\s\+$//
+        silent! %s/\(\s*\n\)\+\%$//
+        call cursor(b:curline, b:curcol)
+    endif
+endfunction
+autocmd BufWritePre * call RemoveTrailingWhitespace()
+
+" user defined command
 command W w !sudo tee % > /dev/null
 
 " vimwiki
@@ -241,8 +261,8 @@ command W w !sudo tee % > /dev/null
 let g:vimwiki_list = [{'path' : '/var/www/vimwiki',
 \ 'path_html' : '/var/www/vimwiki/html',
 \ 'auto_export' : 1,
+\ 'html_header' : '/var/www/vimwiki/template/header.tpl',
 \ }]
-" 'html_header' : '/var/www/vimwiki/template/header.tpl',
 
 let g:vimwiki_auto_checkbox = 0	" 设置列表不自动添加 checkbox
 " let g:vimwiki_w32_dir_enc = 'cp936'	" Windows
